@@ -2,6 +2,8 @@
 
 Every Marvel Cinematic Universe film, series, special, One-Shot and animated title, plotted as a constellation: **story order** runs across, **release date** runs up. A glowing thread joins the Sacred Timeline in story order, so every spike in it is a prequel or a flashback. Alternate universes branch off on dashed pink curves. Counting down to *Avengers: Doomsday* (December 18, 2026).
 
+**Live at [doomsday-clock-mcu.vercel.app](https://doomsday-clock-mcu.vercel.app)**
+
 - Switch between story order and release order; the points glide between the two layouts
 - Filter by phase and type, search titles, and pull in the 13 Fox X-Men films
 - Hover a point for a summary; click it for the synopsis, poster and where to watch
@@ -43,6 +45,8 @@ In PowerShell, set the key with `$env:TMDB_API_KEY = 'your_key'` first. Existing
 ## How it's built
 
 Vite, React 19 and TypeScript with plain CSS. The chart is hand-rolled: an SVG for the guides, thread and branches, with the points as absolutely positioned buttons so they stay round at any aspect ratio. The layout math is a set of pure, unit-tested functions in [`src/lib/layout.ts`](src/lib/layout.ts).
+
+Hosted on Vercel, which runs `npm run build` on every push to `main` and serves `dist/`.
 
 ## Credits
 
