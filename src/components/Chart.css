@@ -196,32 +196,9 @@
   animation: none;
 }
 
-/* Doomsday essentials wear a pale ring; the line under the pointer in the checklist adds a green one */
-.dot--essential::before,
-.dot--spot::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  border-radius: 50%;
-  pointer-events: none;
-}
-.dot--essential::before {
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 1.5px solid var(--essential);
-  opacity: 0.8;
-}
-.dot--spot {
-  z-index: 5;
-}
-.dot--spot::after {
-  width: 32px;
-  height: 32px;
-  margin: -16px 0 0 -16px;
-  border: 2px solid var(--green);
-  box-shadow: 0 0 14px rgba(61, 220, 132, 0.6);
+/* Doomsday essentials breathe a green glow instead of twinkling (lit and dimmed dots keep their own look) */
+.dot--essential:not(.dot--lit):not(.dot--dim) .dot__core {
+  animation: breathe 2.8s ease-in-out infinite;
 }
 
 .dot--mobile {
@@ -329,5 +306,11 @@
   .alt-link,
   .dot__core {
     animation: none;
+  }
+  .dot--essential:not(.dot--lit):not(.dot--dim) .dot__core {
+    animation: none;
+    box-shadow:
+      0 0 0 3px var(--bg),
+      0 0 9px 3px rgba(61, 220, 132, 0.7);
   }
 }

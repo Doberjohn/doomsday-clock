@@ -6,12 +6,12 @@ type Props = {
   layout: ChartLayout
   /** Axis the alternate-universe branches bend along: y on desktop, x on mobile. */
   axis: 'x' | 'y'
-  /** Hovered entry; lights the branches touching it and dims the rest. */
-  hover?: string | null
+  /** Hovered entries; lights the branches touching them and dims the rest. */
+  hover?: readonly string[]
 }
 
 /** The Sacred Timeline (glow, base stroke, travelling pulse) and dashed branches to alternate universes. */
-export function Thread({ layout, axis, hover = null }: Props) {
+export function Thread({ layout, axis, hover = [] }: Props) {
   const pos = useTweenedPositions(layout.positions)
   const d = curve(layout.thread.flatMap((id) => pos.get(id) ?? []))
   return (
@@ -23,11 +23,11 @@ export function Thread({ layout, axis, hover = null }: Props) {
         const from = pos.get(anchor)
         const to = pos.get(id)
         if (!from || !to) return null
-        const lit = hover === id || hover === anchor
+        const lit = hover.includes(id) || hover.includes(anchor)
         return (
           <path
             key={id}
-            className={cx('alt-link', axis === 'x' && 'alt-link--mobile', lit && 'alt-link--lit', hover && !lit && 'alt-link--dim')}
+            className={cx('alt-link', axis === 'x' && 'alt-link--mobile', lit && 'alt-link--lit', hover.length > 0 && !lit && 'alt-link--dim')}
             d={altLinkPath(from, to, axis)}
           />
         )

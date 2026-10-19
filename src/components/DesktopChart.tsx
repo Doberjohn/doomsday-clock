@@ -14,7 +14,7 @@ type Props = {
   onOpen: (id: string) => void
   /** Hides the tooltip while the detail modal is up. */
   modalOpen: boolean
-  /** Titles to ring, e.g. the essentials line under the pointer in the checklist. */
+  /** Titles to light as if hovered, e.g. the essentials line under the pointer in the checklist. */
   spotlight?: readonly string[] | null
 }
 
@@ -24,7 +24,8 @@ export function DesktopChart({ layout, watched, onOpen, modalOpen, spotlight = n
   const { width: W, height: H, positions } = layout
   // Only an entry still on the chart can be hovered; one that was just filtered out must not dim the rest.
   const hovered = layout.shown.find((e) => e.id === hover)
-  const lit = hovered?.id ?? null
+  // The dot under the pointer, else the dots of the spotlit checklist line (both seasons for Loki).
+  const lit = hovered ? [hovered.id] : (spotlight ?? []).filter((id) => positions.has(id))
 
   return (
     <div
@@ -56,7 +57,7 @@ export function DesktopChart({ layout, watched, onOpen, modalOpen, spotlight = n
 
       {layout.shown.map((e) => {
         const p = positions.get(e.id)!
-        const isLit = lit === e.id
+        const isLit = lit.includes(e.id)
         return (
           <button
             key={e.id}
@@ -70,8 +71,7 @@ export function DesktopChart({ layout, watched, onOpen, modalOpen, spotlight = n
               e.essential !== undefined && 'dot--essential',
               watched[e.id] && 'dot--watched',
               isLit && 'dot--lit',
-              lit && !isLit && 'dot--dim',
-              !!spotlight?.includes(e.id) && 'dot--spot',
+              lit.length > 0 && !isLit && 'dot--dim',
             )}
             style={{ left: `${(p.x / W) * 100}%`, top: `${(p.y / H) * 100}%`, '--twinkle-delay': `${p.x % 3}s` }}
             tabIndex={tabbable === e.id ? 0 : -1}
