@@ -20,6 +20,8 @@ export type ChartLayout = {
   /** Visible main-timeline ids the thread passes through, in story order. */
   thread: string[]
   altLinks: AltLink[]
+  /** Visible alternates of each line (e.g. the X-Men films), in story order, drawn as their own dashed thread. */
+  lines: string[][]
   xGuides: Guide[]
   yGuides: Guide[]
 }
@@ -60,22 +62,34 @@ function guides(
   return out
 }
 
-/** The thread runs through visible main-timeline entries in story order; each visible alternate
- *  branches off the nearest visible main-timeline entry before it. */
+/** The thread runs through visible main-timeline entries in story order. Each visible alternate branches
+ *  off the title it names in `branchFrom` while that is visible, else the nearest visible main-timeline
+ *  entry before it; alternates sharing a `line` join up in story order instead, and only the first of
+ *  them branches off. */
 function threadAndBranches(chrono: readonly Entry[], visible: Visible) {
   const thread: string[] = []
   const altLinks: AltLink[] = []
+  const lines = new Map<string, string[]>()
+  const byId = new Map(chrono.map((e) => [e.id, e]))
   let anchor: string | null = null
   for (const e of chrono) {
     if (!visible(e)) continue
     if (!e.alt) {
       thread.push(e.id)
       anchor = e.id
-    } else if (anchor) {
-      altLinks.push({ id: e.id, anchor })
+      continue
     }
+    const line = e.line ? lines.get(e.line) : undefined
+    if (line) {
+      line.push(e.id)
+      continue
+    }
+    if (e.line) lines.set(e.line, [e.id])
+    const named = e.branchFrom ? byId.get(e.branchFrom) : undefined
+    const from = named && visible(named) ? named.id : anchor
+    if (from) altLinks.push({ id: e.id, anchor: from })
   }
-  return { thread, altLinks }
+  return { thread, altLinks, lines: [...lines.values()] }
 }
 
 /** Story (or release) order along x, release date up y, in a 1200×600 viewBox. */

@@ -1,6 +1,6 @@
 # Doomsday Clock
 
-Every Marvel Cinematic Universe film, series, special, One-Shot and animated title, plotted as a constellation: **story order** runs across, **release date** runs up. A glowing thread joins the Sacred Timeline in story order, so every spike in it is a prequel or a flashback. Alternate universes branch off on dashed pink curves. Counting down to *Avengers: Doomsday* (December 18, 2026).
+Every Marvel Cinematic Universe film, series, special, One-Shot and animated title, plotted as a constellation: **story order** runs across, **release date** runs up. A glowing thread joins the Sacred Timeline in story order, so every spike in it is a prequel or a flashback. Alternate universes branch off on dashed pink curves, and the Fox X-Men films run on a dashed thread of their own, in the order they're set, from *First Class* to *Logan* and on into *Deadpool & Wolverine*. Counting down to *Avengers: Doomsday* (December 18, 2026).
 
 **Live at [doomsday-clock-mcu.vercel.app](https://doomsday-clock-mcu.vercel.app)**
 

@@ -25,6 +25,10 @@ export type Entry = {
   link?: string
   /** Alternate universe: dashed styling plus a branch link to the main thread. */
   alt?: boolean
+  /** Alternates only: id of the title the branch starts from, instead of the nearest main-timeline title before it. */
+  branchFrom?: string
+  /** Alternates only: titles sharing a line are joined into one dashed thread in story order, and only the first one visible branches off. */
+  line?: string
   /** Fox X-Men film, hidden unless the X-Men toggle is on. */
   fox?: boolean
   /** Placement is not official. */

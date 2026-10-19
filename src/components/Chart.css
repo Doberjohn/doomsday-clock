@@ -121,6 +121,29 @@
   opacity: 0.4;
 }
 
+/* An alternate universe's own timeline (the X-Men films): a bolder dashed thread through its titles */
+.alt-line {
+  fill: none;
+  stroke: var(--pink);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 5;
+  stroke-linecap: round;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+  animation: drift 3s linear infinite;
+}
+.alt-line--lit {
+  stroke-width: 1.8;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 4px var(--pink));
+}
+.alt-line--dim {
+  opacity: 0.15;
+}
+.alt-line--mobile {
+  opacity: 0.6;
+}
+
 /* Dots: a generous hit area around a small glowing core */
 .dot {
   position: absolute;
@@ -304,6 +327,7 @@
 @media (prefers-reduced-motion: reduce) {
   .thread--pulse,
   .alt-link,
+  .alt-line,
   .dot__core {
     animation: none;
   }

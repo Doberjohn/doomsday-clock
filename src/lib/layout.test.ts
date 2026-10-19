@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { entries } from '../data/entries.ts'
 import type { Entry } from '../data/types.ts'
+import { loadedEntries } from './filters.ts'
 import { altLinkPath, curve, desktopLayout, mobileLayout, type ChartLayout } from './layout.ts'
 
 const entry = (id: string, o: number, rel: string, year: number, extra: Partial<Entry> = {}): Entry => ({
@@ -12,6 +14,12 @@ const B = entry('b', 2, '2008-05-01', 2012, { type: 'series' })
 const C = entry('c', 3, '2012-05-01', 2012, { alt: true })
 const D = entry('d', 4, '2011-05-01', 2014)
 const data = [A, B, C, D]
+
+// Three alternates on one line, woven into story order: A L1 B L2 C L3 D.
+const L1 = entry('l1', 1.5, '2014-01-01', 2011, { alt: true, line: 'x' })
+const L2 = entry('l2', 2.5, '2015-01-01', 2012, { alt: true, line: 'x', branchFrom: 'a' })
+const L3 = entry('l3', 3.5, '2016-01-01', 2013, { alt: true, line: 'x' })
+const withLine = [...data, L1, L2, L3]
 
 const everything = () => true
 const hiding = (...ids: string[]) => (e: Entry) => !ids.includes(e.id)
@@ -70,12 +78,37 @@ describe('desktopLayout', () => {
     expect(desktopLayout(data, 'chrono', hiding('a', 'b')).altLinks).toEqual([])
   })
 
+  it('branches an alternate from the title it names, or the nearest one while that title is hidden', () => {
+    const E = entry('e', 5, '2013-05-01', 2015, { alt: true, branchFrom: 'a' })
+    expect(desktopLayout([...data, E], 'chrono', everything).altLinks).toContainEqual({ id: 'e', anchor: 'a' })
+    expect(desktopLayout([...data, E], 'chrono', hiding('a')).altLinks).toContainEqual({ id: 'e', anchor: 'd' })
+  })
+
   it('never anchors an alternate to another alternate', () => {
     const C2 = entry('c2', 3.5, '2013-01-01', 2012, { alt: true })
     expect(desktopLayout([...data, C2], 'chrono', everything).altLinks).toEqual([
       { id: 'c', anchor: 'b' },
       { id: 'c2', anchor: 'b' },
     ])
+  })
+
+  it('joins alternates on one line into a thread in story order, branching only from the first', () => {
+    const l = desktopLayout(withLine, 'chrono', everything)
+    expect(l.lines).toEqual([['l1', 'l2', 'l3']])
+    expect(l.altLinks).toEqual([
+      { id: 'l1', anchor: 'a' },
+      { id: 'c', anchor: 'b' },
+    ])
+  })
+
+  it("branches a line from its first visible member, from the title that member names", () => {
+    const l = desktopLayout(withLine, 'chrono', hiding('l1'))
+    expect(l.lines).toEqual([['l2', 'l3']])
+    expect(l.altLinks).toContainEqual({ id: 'l2', anchor: 'a' })
+  })
+
+  it('drops a line once none of its members is visible', () => {
+    expect(desktopLayout(withLine, 'chrono', hiding('l1', 'l2', 'l3')).lines).toEqual([])
   })
 
   it('draws release-year guides for years divisible by 3, at the first release that year', () => {
@@ -112,6 +145,26 @@ describe('desktopLayout', () => {
     expect(l.shown).toEqual([])
     expect(l.thread).toEqual([])
     expect(l.altLinks).toEqual([])
+    expect(l.lines).toEqual([])
+  })
+})
+
+describe('the X-Men films in the real data', () => {
+  const layout = (fox: boolean) => desktopLayout(loadedEntries(entries, fox), 'chrono', everything)
+  const branchesInto = (l: ChartLayout) => l.altLinks.filter((link) => l.lines[0].includes(link.id))
+
+  it('run in the order each is set, on into Deadpool & Wolverine, branching once from Multiverse of Madness', () => {
+    const l = layout(true)
+    expect(l.lines).toEqual([
+      ['firstclass', 'dofp', 'wolverine1', 'apocalypse', 'darkphoenix', 'xmen', 'x2', 'x3', 'wolverine2', 'deadpool1', 'deadpool2', 'newmutants', 'logan', 'deadpool3'],
+    ])
+    expect(branchesInto(l)).toEqual([{ id: 'firstclass', anchor: 'mom' }])
+  })
+
+  it('come down to X-Men, X2 and Deadpool & Wolverine with the X-Men toggle off', () => {
+    const l = layout(false)
+    expect(l.lines).toEqual([['xmen', 'x2', 'deadpool3']])
+    expect(branchesInto(l)).toEqual([{ id: 'xmen', anchor: 'mom' }])
   })
 })
 
