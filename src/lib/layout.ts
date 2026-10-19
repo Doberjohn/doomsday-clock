@@ -68,19 +68,22 @@ function guides(
 
 /** The thread runs through visible main-timeline entries in story order. Each visible alternate branches
  *  off the title it names in `branchFrom` while that is visible, else the nearest visible main-timeline
- *  entry before it; alternates sharing a `line` join up in story order instead, and only the first of
- *  them branches off. */
+ *  entry before it, else (with none before it, e.g. under a phase filter) the next one after it.
+ *  Alternates sharing a `line` join up in story order instead, and only the first of them branches off. */
 function threadAndBranches(chrono: readonly Entry[], visible: Visible) {
   const thread: string[] = []
   const altLinks: AltLink[] = []
   const lines = new Map<string, string[]>()
   const byId = new Map(chrono.map((e) => [e.id, e]))
   let anchor: string | null = null
+  let waiting: string[] = []
   for (const e of chrono) {
     if (!visible(e)) continue
     if (!e.alt) {
       thread.push(e.id)
       anchor = e.id
+      for (const id of waiting) altLinks.push({ id, anchor: e.id })
+      waiting = []
       continue
     }
     const line = e.line ? lines.get(e.line) : undefined
@@ -92,6 +95,7 @@ function threadAndBranches(chrono: readonly Entry[], visible: Visible) {
     const named = e.branchFrom ? byId.get(e.branchFrom) : undefined
     const from = named && visible(named) ? named.id : anchor
     if (from) altLinks.push({ id: e.id, anchor: from })
+    else waiting.push(e.id)
   }
   return { thread, altLinks, lines: [...lines.values()] }
 }

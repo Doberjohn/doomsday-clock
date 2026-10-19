@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { entries } from '../data/entries.ts'
 import type { Entry } from '../data/types.ts'
-import { loadedEntries } from './filters.ts'
+import { loadedEntries, matchesFilters } from './filters.ts'
 import { altLinkPath, curve, desktopLayout, mobileLayout, polyline, type ChartLayout } from './layout.ts'
 
 const entry = (id: string, o: number, rel: string, year: number, extra: Partial<Entry> = {}): Entry => ({
@@ -75,7 +75,11 @@ describe('desktopLayout', () => {
   it('anchors each alternate to the nearest preceding visible main-timeline entry', () => {
     expect(desktopLayout(data, 'chrono', everything).altLinks).toEqual([{ id: 'c', anchor: 'b' }])
     expect(desktopLayout(data, 'chrono', hiding('b')).altLinks).toEqual([{ id: 'c', anchor: 'a' }])
-    expect(desktopLayout(data, 'chrono', hiding('a', 'b')).altLinks).toEqual([])
+  })
+
+  it('anchors an alternate to the next visible main-timeline entry when none comes before it', () => {
+    expect(desktopLayout(data, 'chrono', hiding('a', 'b')).altLinks).toEqual([{ id: 'c', anchor: 'd' }])
+    expect(desktopLayout(data, 'chrono', hiding('a', 'b', 'd')).altLinks).toEqual([])
   })
 
   it('branches an alternate from the title it names, or the nearest one while that title is hidden', () => {
@@ -226,6 +230,14 @@ describe('the X-Men films in the real data', () => {
     for (const id of ['xmen', 'x2', 'deadpool3']) expect(Math.abs(x(l, id) - x(l, 'mom'))).toBeLessThan(80)
     expect(y(l, 'xmen')).toBeGreaterThan(y(l, 'x2'))
     expect(y(l, 'x2')).toBeGreaterThan(y(l, 'deadpool3'))
+  })
+})
+
+describe('filtering the real data', () => {
+  it('keeps The Fantastic Four: First Steps connected when only Phase VI shows', () => {
+    const filters = { types: new Set<never>(), phases: new Set(['6']), query: '' }
+    const l = desktopLayout(loadedEntries(entries, false), 'chrono', (e) => matchesFilters(e, filters))
+    expect(l.altLinks).toContainEqual({ id: 'ff', anchor: 'wonderman' })
   })
 })
 
