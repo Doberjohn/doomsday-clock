@@ -1,0 +1,184 @@
+:root {
+  color-scheme: dark;
+
+  --bg: #060a08;
+  --surface: #0a120d;
+  --text: #e6f2ea;
+  --text-2: #a9c4b2;
+  --text-body: #c9dccf;
+  --muted: #7f9a88;
+  --faint: #5f7a68;
+  --dimmest: #4f6a58;
+
+  --green: #3ddc84;
+  --green-light: #7cf0b0;
+  --green-pale: #b7f5c8;
+  --on-green: #03140a;
+  --green-gradient: linear-gradient(180deg, #5ef0a0, #2fb56d);
+  --pink: #ff7bd1;
+  --amber: #ffd166;
+
+  --well: rgba(4, 9, 6, 0.7);
+  --well-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+
+  --display: 'Bowlby One SC', sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Comic Neue', sans-serif;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--green);
+}
+a:hover {
+  color: var(--green-light);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: var(--dimmest);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 1px solid var(--green-light);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Type colors, with the alpha variants the design uses. */
+.t-film {
+  --c: #3ddc84;
+  --c-1f: #3ddc841f;
+  --c-33: #3ddc8433;
+  --c-55: #3ddc8455;
+  --c-66: #3ddc8466;
+  --c-88: #3ddc8488;
+  --c-cc: #3ddc84cc;
+}
+.t-series {
+  --c: #5ed3f3;
+  --c-1f: #5ed3f31f;
+  --c-33: #5ed3f333;
+  --c-55: #5ed3f355;
+  --c-66: #5ed3f366;
+  --c-88: #5ed3f388;
+  --c-cc: #5ed3f3cc;
+}
+.t-special {
+  --c: #ffd166;
+  --c-1f: #ffd1661f;
+  --c-33: #ffd16633;
+  --c-55: #ffd16655;
+  --c-66: #ffd16666;
+  --c-88: #ffd16688;
+  --c-cc: #ffd166cc;
+}
+.t-short {
+  --c: #b7f5c8;
+  --c-1f: #b7f5c81f;
+  --c-33: #b7f5c833;
+  --c-55: #b7f5c855;
+  --c-66: #b7f5c866;
+  --c-88: #b7f5c888;
+  --c-cc: #b7f5c8cc;
+}
+.t-animated {
+  --c: #ff7bd1;
+  --c-1f: #ff7bd11f;
+  --c-33: #ff7bd133;
+  --c-55: #ff7bd155;
+  --c-66: #ff7bd166;
+  --c-88: #ff7bd188;
+  --c-cc: #ff7bd1cc;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@keyframes flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -274;
+  }
+}
+@keyframes drift {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes aura {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 0.85;
+  }
+}
+@keyframes aura2 {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9) rotate(30deg);
+    opacity: 0.6;
+  }
+}
