@@ -5,17 +5,20 @@ import { FoxChip, ModeToggle, PhaseChips, Progress, SearchField, TypeChips } fro
 import { DesktopChart } from './components/DesktopChart.tsx'
 import { DetailModal } from './components/DetailModal.tsx'
 import { EntryList } from './components/EntryList.tsx'
+import { EssentialsChecklist } from './components/EssentialsChecklist.tsx'
 import { MobileChart } from './components/MobileChart.tsx'
 import { entries } from './data/entries.ts'
 import type { Entry, EntryType } from './data/types.ts'
 import { useMediaQuery } from './hooks/useMediaQuery.ts'
 import { useWatched } from './hooks/useWatched.ts'
 import { cx } from './lib/cx.ts'
+import { essentialsList, isWatched, type Essential } from './lib/essentials.ts'
 import { loadedEntries, matchesFilters } from './lib/filters.ts'
 import { desktopLayout, mobileLayout, releaseOrder, storyOrder, type Mode } from './lib/layout.ts'
 import './App.css'
 
 const LOGO_ALT = "Marvel Studios' Avengers: Doomsday"
+const ESSENTIALS = essentialsList(entries)
 
 function toggled<T>(set: ReadonlySet<T>, value: T): Set<T> {
   const next = new Set(set)
@@ -35,7 +38,8 @@ export default function App() {
   const [fox, setFox] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [openId, setOpenId] = useState<string | null>(null)
-  const [watched, toggleWatched] = useWatched()
+  const [spotlight, setSpotlight] = useState<readonly string[] | null>(null)
+  const [watched, toggleWatched, markWatched] = useWatched()
 
   const all = useMemo(() => loadedEntries(entries, fox), [fox])
   const layout = useMemo(() => {
@@ -51,6 +55,7 @@ export default function App() {
   const togglePhase = (phase: string) => setPhases((p) => (phase === 'all' ? new Set() : toggled(p, phase)))
   const toggleType = (type: EntryType) => setTypes((t) => toggled(t, type))
   const toggleFox = () => setFox((f) => !f)
+  const toggleEssential = (item: Essential) => markWatched(item.ids, !isWatched(item, watched))
 
   return (
     <div className="page">
@@ -65,6 +70,7 @@ export default function App() {
           <header className="m-header">
             <img className="m-logo" src={logo} alt={LOGO_ALT} width={450} height={250} />
             <Countdown compact />
+            <EssentialsChecklist items={ESSENTIALS} watched={watched} onToggle={toggleEssential} onOpen={setOpenId} collapsible />
           </header>
           <main className="main">
             <div className="m-bar">
@@ -118,7 +124,8 @@ export default function App() {
             </div>
           </header>
           <main className="main">
-            <DesktopChart layout={layout} watched={watched} onOpen={setOpenId} modalOpen={!!openEntry} />
+            <DesktopChart layout={layout} watched={watched} onOpen={setOpenId} modalOpen={!!openEntry} spotlight={spotlight} />
+            <EssentialsChecklist items={ESSENTIALS} watched={watched} onToggle={toggleEssential} onOpen={setOpenId} onSpotlight={setSpotlight} />
             <EntryList sequence={layout.sequence} mode={mode} watched={watched} />
             <div className="progress-row">
               <Progress done={watchedCount} total={all.length} />

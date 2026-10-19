@@ -43,4 +43,9 @@ describe('loadedEntries', () => {
     expect(loadedEntries(data, false).map((e) => e.id)).toEqual(['ironman', 'daredevil', 'werewolf'])
     expect(loadedEntries(data, true).map((e) => e.id)).toEqual(['ironman', 'daredevil', 'werewolf', 'logan'])
   })
+
+  it('keeps the Fox films that are Doomsday essentials even with the toggle off', () => {
+    const xmen = entry('xmen', 'X-Men', 'film', 0, { fox: true, alt: true, essential: 1 })
+    expect(loadedEntries([ironMan, xmen, logan], false).map((e) => e.id)).toEqual(['ironman', 'xmen'])
+  })
 })

@@ -91,6 +91,10 @@
 .m-header .countdown {
   margin-left: auto;
 }
+.m-header .essentials {
+  flex: 1 0 100%;
+  margin-top: 6px;
+}
 
 .m-logo {
   width: clamp(130px, 40vw, 170px);

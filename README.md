@@ -5,7 +5,8 @@ Every Marvel Cinematic Universe film, series, special, One-Shot and animated tit
 **Live at [doomsday-clock-mcu.vercel.app](https://doomsday-clock-mcu.vercel.app)**
 
 - Switch between story order and release order; the points glide between the two layouts
-- Filter by phase and type, search titles, and pull in the 13 Fox X-Men films
+- Tick off the 15 titles Disney lists as essential before *Doomsday*: they're ringed on the chart, with a checklist under it (a bar that opens into one on phones)
+- Filter by phase and type, search titles, and pull in the other 11 Fox X-Men films (*X-Men* and *X2* always show, as essentials)
 - Hover a point for a summary; click it for the synopsis, poster and where to watch
 - Track what you've watched (saved in your browser)
 - Vertical layout on phones; keyboard navigable (Tab into the chart, arrow keys move along the timeline)
@@ -32,7 +33,7 @@ npm run dev
 
 ## Updating the timeline
 
-Every title lives in [`src/data/entries.ts`](src/data/entries.ts), separate from the UI, so the chart can follow Marvel's revisions to the timeline. Story order (`o`) follows Marvel's official Disney+ timeline; fractional values place titles that aren't on it. The fields are documented in [`src/data/types.ts`](src/data/types.ts).
+Every title lives in [`src/data/entries.ts`](src/data/entries.ts), separate from the UI, so the chart can follow Marvel's revisions to the timeline. Story order (`o`) follows Marvel's official Disney+ timeline; fractional values place titles that aren't on it. Disney's essentials before *Doomsday* carry their list number in `essential`; seasons of one show share a number. The fields are documented in [`src/data/types.ts`](src/data/types.ts).
 
 Posters and TMDB ids are looked up once and committed in [`src/data/tmdb.json`](src/data/tmdb.json), so the site needs no API key at runtime. After adding entries, look up the new ones with a TMDB v3 API key:
 

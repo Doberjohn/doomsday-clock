@@ -31,6 +31,8 @@ export type Entry = {
   disputed?: boolean
   /** Shown in the detail modal in amber. */
   note?: string
+  /** Number on Disney's list of titles to watch before Avengers: Doomsday (October 2026). Seasons of one show share a number. */
+  essential?: number
   /** Synopsis. */
   syn: string
 }

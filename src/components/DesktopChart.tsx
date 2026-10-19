@@ -14,9 +14,11 @@ type Props = {
   onOpen: (id: string) => void
   /** Hides the tooltip while the detail modal is up. */
   modalOpen: boolean
+  /** Titles to ring, e.g. the essentials line under the pointer in the checklist. */
+  spotlight?: readonly string[] | null
 }
 
-export function DesktopChart({ layout, watched, onOpen, modalOpen }: Props) {
+export function DesktopChart({ layout, watched, onOpen, modalOpen, spotlight = null }: Props) {
   const [hover, setHover] = useState<string | null>(null)
   const { containerRef, tabbable, setActive, onKeyDown } = useRovingFocus(layout.sequence)
   const { width: W, height: H, positions } = layout
@@ -65,9 +67,11 @@ export function DesktopChart({ layout, watched, onOpen, modalOpen }: Props) {
               `t-${e.type}`,
               e.type === 'film' && 'dot--film',
               e.alt && 'dot--alt',
+              e.essential !== undefined && 'dot--essential',
               watched[e.id] && 'dot--watched',
               isLit && 'dot--lit',
               lit && !isLit && 'dot--dim',
+              !!spotlight?.includes(e.id) && 'dot--spot',
             )}
             style={{ left: `${(p.x / W) * 100}%`, top: `${(p.y / H) * 100}%`, '--twinkle-delay': `${p.x % 3}s` }}
             tabIndex={tabbable === e.id ? 0 : -1}

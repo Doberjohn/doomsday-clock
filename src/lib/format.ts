@@ -32,7 +32,8 @@ export function setIn(e: Entry): string {
 
 /** Accessible name for a chart dot. */
 export function dotLabel(e: Entry, watched: boolean): string {
-  return `${e.t}, ${TYPE_LABEL[e.type]}, ${e.rel.slice(0, 4)}${watched ? ', watched' : ''}`
+  const essential = e.essential ? `, Doomsday essential ${e.essential}` : ''
+  return `${e.t}, ${TYPE_LABEL[e.type]}, ${e.rel.slice(0, 4)}${essential}${watched ? ', watched' : ''}`
 }
 
 export function tooltipHint(e: Entry, watched: boolean): string {

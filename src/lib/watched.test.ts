@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseWatched, toggleWatched } from './watched.ts'
+import { parseWatched, setWatched, toggleWatched } from './watched.ts'
 
 describe('parseWatched', () => {
   it('reads the stored id map', () => {
@@ -27,5 +27,17 @@ describe('toggleWatched', () => {
 
   it('unmarks a watched title', () => {
     expect(toggleWatched({ loki: 1, ragnarok: 1 }, 'loki')).toEqual({ ragnarok: 1 })
+  })
+})
+
+describe('setWatched', () => {
+  it('marks every given title without touching the original', () => {
+    const before = { ragnarok: 1 as const }
+    expect(setWatched(before, ['loki', 'loki_s2'], true)).toEqual({ ragnarok: 1, loki: 1, loki_s2: 1 })
+    expect(before).toEqual({ ragnarok: 1 })
+  })
+
+  it('unmarks every given title, whether or not it was watched', () => {
+    expect(setWatched({ loki: 1, ragnarok: 1 }, ['loki', 'loki_s2'], false)).toEqual({ ragnarok: 1 })
   })
 })

@@ -19,3 +19,13 @@ export function toggleWatched(watched: Watched, id: string): Watched {
   else next[id] = 1
   return next
 }
+
+/** Marks every id watched, or unwatched when `on` is false. */
+export function setWatched(watched: Watched, ids: readonly string[], on: boolean): Watched {
+  const next = { ...watched }
+  for (const id of ids) {
+    if (on) next[id] = 1
+    else delete next[id]
+  }
+  return next
+}

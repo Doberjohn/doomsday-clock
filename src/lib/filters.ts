@@ -12,7 +12,7 @@ export function matchesFilters(e: Entry, { types, phases, query }: Filters): boo
   )
 }
 
-/** The entries on the chart: the Fox X-Men films only load when their toggle is on. */
+/** The entries on the chart: the Fox X-Men films only load when their toggle is on, except the Doomsday essentials. */
 export function loadedEntries(entries: readonly Entry[], fox: boolean): Entry[] {
-  return fox ? [...entries] : entries.filter((e) => !e.fox)
+  return fox ? [...entries] : entries.filter((e) => !e.fox || e.essential !== undefined)
 }

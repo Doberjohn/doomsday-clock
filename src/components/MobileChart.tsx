@@ -55,7 +55,15 @@ export function MobileChart({ layout, watched, onOpen }: Props) {
             <button
               type="button"
               data-id={e.id}
-              className={cx('dot', 'dot--mobile', `t-${e.type}`, e.type === 'film' && 'dot--film', e.alt && 'dot--alt', isWatched && 'dot--watched')}
+              className={cx(
+                'dot',
+                'dot--mobile',
+                `t-${e.type}`,
+                e.type === 'film' && 'dot--film',
+                e.alt && 'dot--alt',
+                e.essential !== undefined && 'dot--essential',
+                isWatched && 'dot--watched',
+              )}
               style={{ left: `${x}%`, top: `${y}%`, '--twinkle-delay': `${p.y % 3}s` }}
               tabIndex={tabbable === e.id ? 0 : -1}
               aria-label={dotLabel(e, isWatched)}

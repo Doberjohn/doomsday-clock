@@ -41,6 +41,10 @@ describe('dotLabel', () => {
     expect(dotLabel(entry({ t: 'Thor: Ragnarok' }), false)).toBe('Thor: Ragnarok, Film, 2017')
     expect(dotLabel(entry({ t: 'Agent Carter', type: 'short' }), true)).toBe('Agent Carter, One-Shot, 2017, watched')
   })
+
+  it('says when the title is one of the Doomsday essentials', () => {
+    expect(dotLabel(entry({ t: 'Thor: Ragnarok', essential: 5 }), true)).toBe('Thor: Ragnarok, Film, 2017, Doomsday essential 5, watched')
+  })
 })
 
 describe('tooltipHint', () => {

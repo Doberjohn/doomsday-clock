@@ -1,0 +1,212 @@
+/* Essentials before Doomsday: a checklist under the chart; on phones, a bar that opens into it */
+.essentials {
+  position: relative;
+  z-index: 1;
+  padding: 14px 18px 12px;
+  border: 1px solid rgba(61, 220, 132, 0.18);
+  background: rgba(61, 220, 132, 0.025);
+}
+
+.essentials__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.essentials__title {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.essentials__track {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.essentials__bar {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width 0.4s;
+}
+
+.essentials__count {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+/* Three columns of five, read down each column */
+.essentials__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  gap: 2px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.essentials__list[hidden] {
+  display: none;
+}
+
+.essentials__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  font-size: 13px;
+}
+.essentials__item--next {
+  border-color: var(--green);
+}
+
+.essentials__num {
+  min-width: 1.4em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.essentials__name {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--text-body);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.essentials__name:hover {
+  color: var(--green-light);
+}
+.essentials__item--done .essentials__name {
+  color: var(--muted);
+}
+
+.essentials__year {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+}
+
+/* Tick: a ring that fills green with a check once watched */
+.essentials__tick {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: -4px -2px -4px -4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.essentials__tick::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid var(--faint);
+  border-radius: 50%;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.essentials__tick:hover::before {
+  border-color: var(--green-light);
+}
+.essentials__tick[aria-pressed='true']::before {
+  border-color: var(--green);
+  background: var(--green);
+}
+.essentials__tick[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  left: 9.5px;
+  top: 7px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--on-green);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Phones: the head is a button that opens the list, with the progress bar on its own row */
+.essentials--collapsible {
+  padding: 0;
+  border-color: rgba(61, 220, 132, 0.35);
+  background: rgba(61, 220, 132, 0.07);
+}
+.essentials--collapsible .essentials__head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px 10px;
+  width: 100%;
+  margin: 0;
+  padding: 9px 12px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.essentials--collapsible .essentials__title {
+  grid-area: 1 / 1;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+.essentials--collapsible .essentials__count {
+  grid-area: 1 / 2;
+  font-size: 12px;
+}
+.essentials--collapsible .essentials__track {
+  grid-area: 2 / 1 / 3 / -1;
+}
+.essentials__chevron {
+  grid-area: 1 / 3;
+  width: 7px;
+  height: 7px;
+  border: solid var(--green);
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s;
+}
+.essentials__head[aria-expanded='true'] .essentials__chevron {
+  transform: translateY(2px) rotate(-135deg);
+}
+.essentials--collapsible .essentials__list {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: none;
+  grid-auto-flow: row;
+  padding: 4px 8px 10px;
+  border-top: 1px solid rgba(61, 220, 132, 0.15);
+}
+.essentials--collapsible .essentials__item {
+  padding: 4px 6px;
+}
+/* No hover on touch screens to reveal a cut-off title, so long ones wrap */
+.essentials--collapsible .essentials__name {
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .essentials__bar,
+  .essentials__chevron {
+    transition: none;
+  }
+}
