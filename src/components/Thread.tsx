@@ -1,6 +1,6 @@
 import { useTweenedPositions } from '../hooks/useTweenedPositions.ts'
 import { cx } from '../lib/cx.ts'
-import { altLinkPath, curve, type ChartLayout } from '../lib/layout.ts'
+import { altLinkPath, curve, polyline, type ChartLayout } from '../lib/layout.ts'
 
 type Props = {
   layout: ChartLayout
@@ -11,7 +11,7 @@ type Props = {
 }
 
 /** The Sacred Timeline (glow, base stroke, travelling pulse), dashed branches to alternate universes,
- *  and the dashed thread of each alternate line (e.g. the X-Men films). */
+ *  and the dashed thread of each alternate line (e.g. the X-Men films), drawn straight so it never swings past a title. */
 export function Thread({ layout, axis, hover = [] }: Props) {
   const pos = useTweenedPositions(layout.positions)
   const d = curve(layout.thread.flatMap((id) => pos.get(id) ?? []))
@@ -34,7 +34,7 @@ export function Thread({ layout, axis, hover = [] }: Props) {
         return <path key={id} className={state(touches(lineOf.get(id) ?? [id], anchor), 'alt-link')} d={altLinkPath(from, to, axis)} />
       })}
       {layout.lines.map((ids) => (
-        <path key={ids[0]} className={state(touches(ids, anchorOf.get(ids[0])), 'alt-line')} d={curve(ids.flatMap((id) => pos.get(id) ?? []))} />
+        <path key={ids[0]} className={state(touches(ids, anchorOf.get(ids[0])), 'alt-line')} d={polyline(ids.flatMap((id) => pos.get(id) ?? []))} />
       ))}
     </>
   )

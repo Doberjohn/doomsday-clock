@@ -29,6 +29,10 @@ export type ChartLayout = {
 type Visible = (e: Entry) => boolean
 
 const DESKTOP = { width: 1200, height: 600, pad: 40 }
+/** The off-grid band, relative to the title it branches from: where it starts (just left of it, so the branch
+ *  drops straight down), how far below it hangs, and how much higher each later release sits. It spreads its
+ *  titles evenly, at most `maxStep` apart, no closer than `edge` to the chart's right side. */
+const BAND = { gap: -10, drop: 50, rise: 18, maxStep: 30, edge: 30 }
 const MOBILE = { width: 400, padX: 36, padY: 44, pitch: 48 }
 const KEY_YEARS = [1943, 1995, 2010, 2012, 2014, 2016, 2018, 2023, 2025, 2026]
 
@@ -92,30 +96,64 @@ function threadAndBranches(chrono: readonly Entry[], visible: Visible) {
   return { thread, altLinks, lines: [...lines.values()] }
 }
 
-/** Story (or release) order along x, release date up y, in a 1200×600 viewBox. */
+/** The Fox films aren't on Marvel's timeline, so they take no slot on the desktop grid; nor does anything sharing
+ *  a line with them (Deadpool & Wolverine), which joins their band. */
+function offGridTest(all: readonly Entry[]) {
+  const foxLines = new Set(all.filter((e) => e.fox && e.line).map((e) => e.line))
+  return (e: Entry) => !!e.fox || (!!e.line && foxLines.has(e.line))
+}
+
+/** Off-grid titles hang in a band below the title the first of them branches from (else the nearest grid title
+ *  before it): story order across, from right under that title towards the right edge, and release order up. */
+function band(all: readonly Entry[], offGrid: (e: Entry) => boolean, gridAt: (id: string) => Point | undefined, right: number) {
+  const members = storyOrder(all.filter(offGrid))
+  const out = new Map<string, Point>()
+  if (!members.length) return out
+  const first = members[0]
+  const before = storyOrder(all).filter((e) => !offGrid(e) && e.o < first.o).at(-1)
+  const named = first.branchFrom ? gridAt(first.branchFrom) : undefined
+  const anchor = named ?? (before ? gridAt(before.id) : undefined)
+  if (!anchor) return out
+  const rank = new Map(releaseOrder(members).map((e, i) => [e.id, i]))
+  const x0 = anchor.x + BAND.gap
+  const step = members.length > 1 ? Math.min(BAND.maxStep, (right - x0) / (members.length - 1)) : 0
+  const top = anchor.y + BAND.drop
+  members.forEach((e, i) => {
+    out.set(e.id, { x: x0 + i * step, y: top + (members.length - 1 - rank.get(e.id)!) * BAND.rise })
+  })
+  return out
+}
+
+/** Story (or release) order along x, release date up y, in a 1200×600 viewBox; off-grid titles sit in a band. */
 export function desktopLayout(all: readonly Entry[], mode: Mode, visible: Visible): ChartLayout {
   const { width, height, pad } = DESKTOP
-  const chrono = storyOrder(all)
-  const release = releaseOrder(all)
+  const offGrid = offGridTest(all)
+  const grid = all.filter((e) => !offGrid(e))
+  const chrono = storyOrder(grid)
+  const release = releaseOrder(grid)
   const xs = mode === 'chrono' ? chrono : release
-  const n = Math.max(1, all.length - 1)
+  const n = Math.max(1, grid.length - 1)
   const px = (i: number) => pad + (i / n) * (width - 2 * pad)
   const py = (i: number) => height - pad - (i / n) * (height - 2 * pad)
 
-  // Slots span every loaded entry, so filtering hides dots without moving the rest.
+  // Slots span every loaded grid entry, so filtering hides dots without moving the rest.
   const slotX = new Map(xs.map((e, i) => [e.id, px(i)]))
+  const slotY = new Map(release.map((e, i) => [e.id, py(i)]))
+  const gridAt = (id: string) => (slotX.has(id) ? { x: slotX.get(id)!, y: slotY.get(id)! } : undefined)
+  const banded = band(all, offGrid, gridAt, width - BAND.edge)
   const positions = new Map<string, Point>()
-  release.forEach((e, i) => {
-    if (visible(e)) positions.set(e.id, { x: slotX.get(e.id)!, y: py(i) })
-  })
+  for (const e of all) {
+    const p = gridAt(e.id) ?? banded.get(e.id)
+    if (p && visible(e)) positions.set(e.id, p)
+  }
 
   return {
     width,
     height,
     positions,
     shown: all.filter(visible),
-    sequence: xs.filter(visible),
-    ...threadAndBranches(chrono, visible),
+    sequence: (mode === 'chrono' ? storyOrder(all) : releaseOrder(all)).filter(visible),
+    ...threadAndBranches(storyOrder(all), visible),
     xGuides: guides(xs, px, storyAxis(mode), 60),
     yGuides: guides(release, py, { label: releaseYear, qualifies: everyThirdYear }),
   }
@@ -161,6 +199,11 @@ export function curve(pts: readonly Point[]): string {
     d += ` C ${r(p1.x + (p2.x - p0.x) / 6)} ${r(p1.y + (p2.y - p0.y) / 6)}, ${r(p2.x - (p3.x - p1.x) / 6)} ${r(p2.y - (p3.y - p1.y) / 6)}, ${r(p2.x)} ${r(p2.y)}`
   }
   return d
+}
+
+/** Straight segments through every point. */
+export function polyline(pts: readonly Point[]): string {
+  return pts.map((p, i) => `${i ? 'L' : 'M'} ${r(p.x)} ${r(p.y)}`).join(' ')
 }
 
 /** Branch from main-thread anchor `a` out to alternate `b`, bending along `axis` (y on desktop, x on mobile). */

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { entries } from '../data/entries.ts'
 import type { Entry } from '../data/types.ts'
 import { loadedEntries } from './filters.ts'
-import { altLinkPath, curve, desktopLayout, mobileLayout, type ChartLayout } from './layout.ts'
+import { altLinkPath, curve, desktopLayout, mobileLayout, polyline, type ChartLayout } from './layout.ts'
 
 const entry = (id: string, o: number, rel: string, year: number, extra: Partial<Entry> = {}): Entry => ({
   o, id, t: id, type: 'film', ph: 1, year, rel, run: '100 min', watch: 'Disney+', syn: '', ...extra,
@@ -111,6 +111,41 @@ describe('desktopLayout', () => {
     expect(desktopLayout(withLine, 'chrono', hiding('l1', 'l2', 'l3')).lines).toEqual([])
   })
 
+  // Fox films off Marvel's timeline, branching from B: story order F1 F2 F3, release order F2 F3 F1.
+  const fox = (id: string, o: number, rel: string) => entry(id, o, rel, 2000, { fox: true, alt: true, line: 'f', branchFrom: 'b' })
+  const withFox = [...data, fox('f1', 2.1, '2005-01-01'), fox('f2', 2.2, '2001-01-01'), fox('f3', 2.3, '2003-01-01')]
+
+  it('gives Fox films no slot on the main grid', () => {
+    const plain = desktopLayout(data, 'chrono', everything)
+    const l = desktopLayout(withFox, 'chrono', everything)
+    for (const id of ['a', 'b', 'c', 'd']) expect(l.positions.get(id)).toEqual(plain.positions.get(id))
+  })
+
+  it('hangs Fox films in a band right under their branch title: story order across at an even step, release order up', () => {
+    const l = desktopLayout(withFox, 'chrono', everything)
+    expect(Math.abs(x(l, 'f1') - x(l, 'b'))).toBeLessThan(20)
+    expect(x(l, 'f2') - x(l, 'f1')).toBeCloseTo(x(l, 'f3') - x(l, 'f2'))
+    expect(x(l, 'f2')).toBeGreaterThan(x(l, 'f1'))
+    expect(y(l, 'f1')).toBeLessThan(y(l, 'f3'))
+    expect(y(l, 'f3')).toBeLessThan(y(l, 'f2'))
+    for (const id of ['f1', 'f2', 'f3']) expect(y(l, id)).toBeGreaterThan(y(l, 'b'))
+  })
+
+  it('keeps the band in place while its branch title is filtered out', () => {
+    const shown = desktopLayout(withFox, 'chrono', everything)
+    const hidden = desktopLayout(withFox, 'chrono', hiding('b'))
+    for (const id of ['f1', 'f2', 'f3']) expect(hidden.positions.get(id)).toEqual(shown.positions.get(id))
+  })
+
+  it('pulls the rest of a Fox line into its band too', () => {
+    const G = entry('g', 3.5, '2009-01-01', 2009, { alt: true, line: 'f' })
+    const plain = desktopLayout(data, 'chrono', everything)
+    const l = desktopLayout([...withFox, G], 'chrono', everything)
+    for (const id of ['a', 'b', 'c', 'd']) expect(l.positions.get(id)).toEqual(plain.positions.get(id))
+    expect(x(l, 'g')).toBeGreaterThan(x(l, 'f3'))
+    for (const id of ['f1', 'f2', 'f3']) expect(y(l, 'g')).toBeLessThan(y(l, id))
+  })
+
   it('draws release-year guides for years divisible by 3, at the first release that year', () => {
     const l = desktopLayout(data, 'chrono', everything)
     expect(l.yGuides).toHaveLength(1)
@@ -151,6 +186,7 @@ describe('desktopLayout', () => {
 
 describe('the X-Men films in the real data', () => {
   const layout = (fox: boolean) => desktopLayout(loadedEntries(entries, fox), 'chrono', everything)
+  const inBand = (id: string) => !!entries.find((e) => e.id === id)?.fox || id === 'deadpool3'
   const branchesInto = (l: ChartLayout) => l.altLinks.filter((link) => l.lines[0].includes(link.id))
 
   it('run in the order each is set, on into Deadpool & Wolverine, branching once from Multiverse of Madness', () => {
@@ -165,6 +201,41 @@ describe('the X-Men films in the real data', () => {
     const l = layout(false)
     expect(l.lines).toEqual([['xmen', 'x2', 'deadpool3']])
     expect(branchesInto(l)).toEqual([{ id: 'xmen', anchor: 'mom' }])
+  })
+
+  it('leave every main-timeline dot in place when the X-Men toggle flips', () => {
+    const off = layout(false)
+    const on = layout(true)
+    for (const [id, p] of off.positions) if (!inBand(id)) expect(on.positions.get(id)).toEqual(p)
+  })
+
+  it('start their band right under Multiverse of Madness and end it at Deadpool & Wolverine, the latest release', () => {
+    const l = layout(true)
+    expect(Math.abs(x(l, 'firstclass') - x(l, 'mom'))).toBeLessThan(20)
+    expect(x(l, 'deadpool3')).toBeGreaterThan(x(l, 'logan'))
+    for (const id of l.lines[0].slice(0, -1)) expect(y(l, 'deadpool3')).toBeLessThan(y(l, id))
+  })
+
+  it('keep a roomy step between neighbours across the band', () => {
+    const l = layout(true)
+    expect(x(l, 'dofp') - x(l, 'firstclass')).toBeGreaterThan(28)
+  })
+
+  it('tuck X-Men, X2 and Deadpool & Wolverine right under Multiverse of Madness with the toggle off', () => {
+    const l = layout(false)
+    for (const id of ['xmen', 'x2', 'deadpool3']) expect(Math.abs(x(l, id) - x(l, 'mom'))).toBeLessThan(80)
+    expect(y(l, 'xmen')).toBeGreaterThan(y(l, 'x2'))
+    expect(y(l, 'x2')).toBeGreaterThan(y(l, 'deadpool3'))
+  })
+})
+
+describe('polyline', () => {
+  it('is empty without points', () => {
+    expect(polyline([])).toBe('')
+  })
+
+  it('joins points with straight segments, rounded to two decimals', () => {
+    expect(polyline([{ x: 1, y: 2 }, { x: 3.456, y: 4 }, { x: 5, y: 0.001 }])).toBe('M 1 2 L 3.46 4 L 5 0')
   })
 })
 
