@@ -56,46 +56,12 @@
   letter-spacing: 0.12em;
 }
 
-/* Story / release toggle */
-.segmented {
-  display: flex;
-  border: 1px solid rgba(61, 220, 132, 0.3);
-  background: var(--well);
-  box-shadow: var(--well-shadow);
-}
-.segmented--fill {
-  flex: 1;
-}
-
-.segmented__btn {
-  background: transparent;
-  color: var(--muted);
-  border: none;
-  box-shadow: none;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  font-family: var(--display);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-}
-.segmented__btn[aria-pressed='true'] {
-  background: var(--green-gradient);
-  color: var(--on-green);
-  box-shadow:
-    0 0 16px rgba(61, 220, 132, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
 /* Phase chips */
 .phases {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
   align-items: center;
-}
-.phases--end {
-  justify-content: flex-end;
 }
 
 .phases__label {

@@ -4,8 +4,7 @@ Every Marvel Cinematic Universe film, series, special, One-Shot and animated tit
 
 **Live at [doomsday-clock-mcu.vercel.app](https://doomsday-clock-mcu.vercel.app)**
 
-- Switch between story order and release order; the points glide between the two layouts
-- Tick off the 15 titles Disney lists as essential before *Doomsday*: they're ringed on the chart, with a checklist under it (a bar that opens into one on phones)
+- Tick off the 15 titles Disney lists as essential before *Doomsday*: they glow on the chart, with a checklist under it (a bar that opens into one on phones)
 - Filter by phase and type, search titles, and pull in the other 11 Fox X-Men films (*X-Men* and *X2* always show, as essentials)
 - Hover a point for a summary; click it for the synopsis, poster and where to watch
 - Track what you've watched (saved in your browser)

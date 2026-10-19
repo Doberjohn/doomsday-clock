@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import logo from './assets/doomsday-logo.png'
 import { Countdown } from './components/Countdown.tsx'
-import { FoxChip, ModeToggle, PhaseChips, Progress, SearchField, TypeChips } from './components/controls.tsx'
+import { FoxChip, PhaseChips, Progress, SearchField, TypeChips } from './components/controls.tsx'
 import { DesktopChart } from './components/DesktopChart.tsx'
 import { DetailModal } from './components/DetailModal.tsx'
 import { EntryList } from './components/EntryList.tsx'
@@ -14,7 +14,7 @@ import { useWatched } from './hooks/useWatched.ts'
 import { cx } from './lib/cx.ts'
 import { essentialsList, isWatched, type Essential } from './lib/essentials.ts'
 import { loadedEntries, matchesFilters } from './lib/filters.ts'
-import { desktopLayout, mobileLayout, releaseOrder, storyOrder, type Mode } from './lib/layout.ts'
+import { desktopLayout, mobileLayout, releaseOrder, storyOrder } from './lib/layout.ts'
 import './App.css'
 
 const LOGO_ALT = "Marvel Studios' Avengers: Doomsday"
@@ -31,7 +31,6 @@ const rankById = (ordered: readonly Entry[]) => new Map(ordered.map((e, i) => [e
 
 export default function App() {
   const isMobile = useMediaQuery('(max-width: 720px)')
-  const [mode, setMode] = useState<Mode>('chrono')
   const [types, setTypes] = useState<ReadonlySet<EntryType>>(() => new Set())
   const [phases, setPhases] = useState<ReadonlySet<string>>(() => new Set())
   const [query, setQuery] = useState('')
@@ -45,8 +44,9 @@ export default function App() {
   const layout = useMemo(() => {
     const filters = { types, phases, query }
     const visible = (e: Entry) => matchesFilters(e, filters)
-    return (isMobile ? mobileLayout : desktopLayout)(all, mode, visible)
-  }, [isMobile, all, mode, types, phases, query])
+    // Always the Sacred Timeline: story order along the chart.
+    return (isMobile ? mobileLayout : desktopLayout)(all, 'chrono', visible)
+  }, [isMobile, all, types, phases, query])
   const ranks = useMemo(() => ({ story: rankById(storyOrder(all)), release: rankById(releaseOrder(all)) }), [all])
 
   const watchedCount = all.filter((e) => watched[e.id]).length
@@ -75,7 +75,7 @@ export default function App() {
           <main className="main">
             <div className="m-bar">
               <div className="m-bar__row">
-                <ModeToggle mode={mode} onChange={setMode} labels={['Story', 'Release']} fill />
+                <SearchField value={query} onChange={setQuery} compact />
                 <button
                   type="button"
                   className={cx('filters-btn', filtersActive && 'filters-btn--active')}
@@ -87,7 +87,6 @@ export default function App() {
                   {filtersActive ? 'Filters •' : 'Filters'}
                 </button>
               </div>
-              <SearchField value={query} onChange={setQuery} compact />
               {filtersOpen && (
                 <div id="filters" className="m-filters">
                   <PhaseChips phases={phases} onToggle={togglePhase} />
@@ -100,7 +99,7 @@ export default function App() {
               )}
             </div>
             <MobileChart layout={layout} watched={watched} onOpen={setOpenId} />
-            <EntryList sequence={layout.sequence} mode={mode} watched={watched} />
+            <EntryList sequence={layout.sequence} watched={watched} />
           </main>
         </>
       ) : (
@@ -113,9 +112,8 @@ export default function App() {
             <div className="panel">
               <div className="panel__row">
                 <SearchField value={query} onChange={setQuery} />
-                <ModeToggle mode={mode} onChange={setMode} labels={['Sacred Timeline', 'Release']} />
+                <PhaseChips phases={phases} onToggle={togglePhase} />
               </div>
-              <PhaseChips phases={phases} onToggle={togglePhase} alignEnd />
               <div className="chip-row chip-row--end">
                 <TypeChips types={types} onToggle={toggleType} />
                 <span className="chip-divider" aria-hidden="true" />
@@ -126,7 +124,7 @@ export default function App() {
           <main className="main">
             <DesktopChart layout={layout} watched={watched} onOpen={setOpenId} modalOpen={!!openEntry} spotlight={spotlight} />
             <EssentialsChecklist items={ESSENTIALS} watched={watched} onToggle={toggleEssential} onOpen={setOpenId} onSpotlight={setSpotlight} />
-            <EntryList sequence={layout.sequence} mode={mode} watched={watched} />
+            <EntryList sequence={layout.sequence} watched={watched} />
             <div className="progress-row">
               <Progress done={watchedCount} total={all.length} />
             </div>

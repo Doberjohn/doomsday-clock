@@ -2,7 +2,6 @@ import { useId } from 'react'
 import type { EntryType } from '../data/types.ts'
 import { cx } from '../lib/cx.ts'
 import { TYPE_LABEL, TYPES } from '../lib/format.ts'
-import type { Mode } from '../lib/layout.ts'
 import './controls.css'
 
 export function SearchField({ value, onChange, compact = false }: { value: string; onChange: (value: string) => void; compact?: boolean }) {
@@ -24,19 +23,6 @@ export function SearchField({ value, onChange, compact = false }: { value: strin
   )
 }
 
-export function ModeToggle({ mode, onChange, labels, fill = false }: { mode: Mode; onChange: (mode: Mode) => void; labels: [chrono: string, release: string]; fill?: boolean }) {
-  return (
-    <div className={cx('segmented', fill && 'segmented--fill')} role="group" aria-label="Order">
-      <button type="button" className="segmented__btn" aria-pressed={mode === 'chrono'} onClick={() => onChange('chrono')}>
-        {labels[0]}
-      </button>
-      <button type="button" className="segmented__btn" aria-pressed={mode === 'release'} onClick={() => onChange('release')}>
-        {labels[1]}
-      </button>
-    </div>
-  )
-}
-
 const PHASES = [
   ['all', 'All'],
   ['1', 'I'],
@@ -49,10 +35,10 @@ const PHASES = [
 ] as const
 
 /** Phase filter. Additive: "All" clears, picking I then II shows both. */
-export function PhaseChips({ phases, onToggle, alignEnd = false }: { phases: ReadonlySet<string>; onToggle: (phase: string) => void; alignEnd?: boolean }) {
+export function PhaseChips({ phases, onToggle }: { phases: ReadonlySet<string>; onToggle: (phase: string) => void }) {
   const labelId = useId()
   return (
-    <div className={cx('phases', alignEnd && 'phases--end')} role="group" aria-labelledby={labelId}>
+    <div className="phases" role="group" aria-labelledby={labelId}>
       <span id={labelId} className="phases__label">
         Phase
       </span>
