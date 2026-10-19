@@ -151,18 +151,49 @@
   padding-bottom: 4px;
 }
 
+/* Footer: credit in the left corner, disclaimer on the right; stacked on phones. */
 .footer {
   position: relative;
   z-index: 1;
   margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
   font-size: 11px;
   line-height: 1.6;
   color: var(--dimmest);
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer__credit {
+  flex: none;
+}
+
+.footer__note {
   text-align: right;
+}
+
+.footer__link {
+  color: var(--green);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(61, 220, 132, 0.45);
+  padding-bottom: 1px;
+}
+.footer__link:hover {
+  color: var(--green-pale);
+  border-bottom-color: var(--green-pale);
 }
 
 @media (max-width: 720px) {
   .footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .footer__note {
     text-align: left;
   }
 }

@@ -128,8 +128,21 @@ export default function App() {
       )}
 
       <footer className="footer">
-        Unofficial fan project, not affiliated with Marvel Studios or Disney. This product uses the TMDB API but is not
-        endorsed or certified by TMDB.
+        <p className="footer__credit">
+          Designed and developed by{' '}
+          <a
+            className="footer__link"
+            href="https://www.linkedin.com/in/john-fanidis"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            John Fanidis
+          </a>
+        </p>
+        <p className="footer__note">
+          Unofficial fan project, not affiliated with Marvel Studios or Disney. This product uses the TMDB API but is not
+          endorsed or certified by TMDB.
+        </p>
       </footer>
 
       {openEntry && (
