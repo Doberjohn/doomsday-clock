@@ -137,11 +137,11 @@ export default function App() {
           Designed and developed by{' '}
           <a
             className="footer__link"
-            href="https://www.linkedin.com/in/john-fanidis"
+            href="https://recurssive.com/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            John Fanidis
+            Recurssive
           </a>
         </p>
         <p className="footer__note">
