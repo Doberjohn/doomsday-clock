@@ -185,23 +185,17 @@
   margin: 0;
 }
 
+/* The credit inherits this colour. --dimmest is 3.35:1 on --bg, and the credit's
+   default 75% resting opacity would take it to 2.36:1, so it uses --muted
+   (6.52:1) at full opacity instead. */
 .footer__credit {
   flex: none;
+  color: var(--muted);
+  --rcsv-dim: 1;
 }
 
 .footer__note {
   text-align: right;
-}
-
-.footer__link {
-  color: var(--green);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(61, 220, 132, 0.45);
-  padding-bottom: 1px;
-}
-.footer__link:hover {
-  color: var(--green-pale);
-  border-bottom-color: var(--green-pale);
 }
 
 @media (max-width: 720px) {

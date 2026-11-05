@@ -7,6 +7,7 @@ import { DetailModal } from './components/DetailModal.tsx'
 import { EntryList } from './components/EntryList.tsx'
 import { EssentialsChecklist } from './components/EssentialsChecklist.tsx'
 import { MobileChart } from './components/MobileChart.tsx'
+import { RecurssiveCredit } from './components/RecurssiveCredit.tsx'
 import { entries } from './data/entries.ts'
 import type { Entry, EntryType } from './data/types.ts'
 import { useMediaQuery } from './hooks/useMediaQuery.ts'
@@ -134,15 +135,7 @@ export default function App() {
 
       <footer className="footer">
         <p className="footer__credit">
-          Designed and developed by{' '}
-          <a
-            className="footer__link"
-            href="https://recurssive.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Recurssive
-          </a>
+          <RecurssiveCredit variant="plain" tone="dark" />
         </p>
         <p className="footer__note">
           Unofficial fan project, not affiliated with Marvel Studios or Disney. This product uses the TMDB API but is not
